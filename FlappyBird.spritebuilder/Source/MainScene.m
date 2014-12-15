@@ -68,8 +68,8 @@
     [_parallaxContainer addChild:_parallaxBackground];
     
     //note that the bush ratio is larger than the cloud
-    _bushParallaxRatio = ccp(3,1);
-    _cloudParallaxRatio = ccp(3,1);
+    _bushParallaxRatio = ccp(0.9,1);
+    _cloudParallaxRatio = ccp(0.5,1);
     
     for (CCNode *bush in _bushes){
         CGPoint offset = bush.position;
@@ -243,21 +243,17 @@
         }
     }
     
-    // loop the clouds
+    // move and loop the clouds
     for (CCNode *cloud in _clouds) {
-        // get the world position of the cloud
-        CGPoint cloudWorldPosition = [_parallaxBackground convertToWorldSpace:cloud.position];
-        // get the screen position of the cloud
-        CGPoint cloudScreenPosition = [self convertToNodeSpace:cloudWorldPosition];
+        // move the cloud
+        cloud.position = ccp(cloud.position.x -
+                             (character.physicsBody.velocity.x * delta), cloud.position.y);
         
         // if the left corner is one complete width off the screen,
         // move it to the right
-        if (cloudScreenPosition.x <= (-1 * cloud.contentSize.width)) {
-            for (CGPointObject *child in _parallaxBackground.parallaxArray) {
-                if (child.child == cloud) {
-                    child.offset = ccp(child.offset.x + 2*cloud.contentSize.width, child.offset.y);
-                }
-            }
+        if (cloud.position.x <= (-1 * cloud.contentSize.width)) {
+            cloud.position = ccp(cloud.position.x +
+                                 2 * cloud.contentSize.width, cloud.position.y);
         }
     }
     
